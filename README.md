@@ -1,5 +1,6 @@
 # Python-Tic-Tac-Toe
-A cool little tic tae toc game made in python.
+A simple little tic tae toc game made in python.
+
 ![Game icon](https://raw.githubusercontent.com/RXCodes/Python-Tic-Tac-Toe/main/images/Icon.jpg)
 
 ## Prototype #1:
