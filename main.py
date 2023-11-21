@@ -5,10 +5,25 @@ import random
 imageRootSource = "https://raw.githubusercontent.com/RXCodes/Python-Tic-Tac-Toe/main/images/"
 playerOImg = simplegui.load_image(imageRootSource + "Player-O.PNG")
 playerXImg = simplegui.load_image(imageRootSource + "Player-X.PNG")
+background = simplegui.load_image(imageRootSource + "Tic-Tac-Toe_Blank.png")
+TicTacToeMainMenu = simplegui.load_image(imageRootSource + "Tic-Tac-Toe_Main_Menu_No_Buttins.png")
+TicTacToeMainCredits = simplegui.load_image(imageRootSource + "Tic-Tac-Toe_Credits.png")
+TicTacToeOptions = simplegui.load_image(imageRootSource + "Tic-Tac-Toe_Options_Text.png")
+backArrow = simplegui.load_image(imageRootSource + "BackArrow.PNG")
+CPUHardHighlight = simplegui.load_image(imageRootSource + "CPU_Hard_Highlight.png")
+CPUEasyHighlight = simplegui.load_image(imageRootSource + "CPU_Easy_Highlight.png")
+Player1HumanHighlight = simplegui.load_image(imageRootSource + "Player_1_Human_Highlight.png")
+Player2HumanHighlight = simplegui.load_image(imageRootSource + "Player_2_Human_Highlight.png")
+Player1CPUHighlight = simplegui.load_image(imageRootSource + "Player_1_CPU_Highlight.png")
+Player2CPUHighlight = simplegui.load_image(imageRootSource + "Player_2_CPU_Highlight.png")
+boardImage = simplegui.load_image(imageRootSource + "Board.png")
+endscreenX = simplegui.load_image(imageRootSource + "EndScreenX.png")
+endscreenO = simplegui.load_image(imageRootSource + "EndScreenO.png")
+endscreenTie = simplegui.load_image(imageRootSource + "EndScreenTie.png")
 
 # Some graphical settings
 gridSize = 30
-iconSize = 50
+iconSize = 55
 
 def resetButtonPressed():
     goToMenu("Main Menu")
@@ -25,6 +40,13 @@ def goToMenu(name):
     if name == "Board Menu":
         global boardMenu
         frame.set_draw_handler(boardMenu)
+    if name == "Credits Menu":
+        global creditsMenu
+        frame.set_draw_handler(creditsMenu)
+    if name == "Options Menu":
+        global optionsMenu
+        frame.set_draw_handler(optionsMenu)
+
 
 # Check if point is inside rectangle
 def rectangleCheck(position, rectPosition, rectSize):
@@ -45,9 +67,25 @@ def mouse_handler(position):
     if currentMenu == "Main Menu":
     
         # when click on "Play Game" button
-        if rectangleCheck(position, (40, 230), (230, 260)):
+        if rectangleCheck(position, (135, 244.5), (190, 29)):
             goToMenu("Board Menu")
             startGame()
+            return
+            
+        # when click on "Options" button
+        if rectangleCheck(position, (135, 214.5), (190, 29)):
+            goToMenu("Options Menu")
+            return
+        
+        # when click on "Credits" button
+        if rectangleCheck(position, (135, 184.5), (190, 29)):
+            goToMenu("Credits Menu")
+            return
+                 
+    # tapping back button will go to menu
+    if currentMenu != "Main Menu":
+        if rectangleCheck(position, (20, 280), (30, 30)):
+            goToMenu("Main Menu")
             return
             
     # when in the game board
@@ -70,31 +108,112 @@ def mouse_handler(position):
                 if rectangleCheck(position, cellPosition, (doubleGridSize, doubleGridSize)):
                     gridClicked(row, column)
                     return
+                
+    # when in options menu
+    if currentMenu == "Options Menu":
+        global player_x
+        global player_o
+        global hardCPUDifficulty
+        
+        # when tapped on "Human" for Player 1
+        if rectangleCheck(position, (50.5, 150), (79, 26)):
+            player_x = "player"
+            return
+        
+        # when tapped on "CPU" for Player 1
+        if rectangleCheck(position, (117.5, 150), (49, 26)):
+            player_x = "bot"
+            return
+        
+        # when tapped on "Human" for Player 2
+        if rectangleCheck(position, (200.5, 150), (79, 26)):
+            player_o = "player"
+            return
+        
+        # when tapped on "CPU" for Player 2
+        if rectangleCheck(position, (267.5, 150), (49, 26)):
+            player_o = "bot"
+            return
+        
+        # when tapped on "Easy" CPU difficulty
+        if rectangleCheck(position, (104.5, 252.5), (55, 27)):
+            hardCPUDifficulty = False
+            return
+        
+        # when tapped on "Hard" CPU difficulty
+        if rectangleCheck(position, (197.5, 252.5), (55, 27)):
+            hardCPUDifficulty = True
+            return
+                
+# draw the image to fill the entire screen
+def drawToEntireScreen(canvas, image):
+    if image.get_width() == 0:
+        return # image is not loaded yet
+    imageSize = (image.get_width(), image.get_height())
+    imageCenter = (image.get_width() / 2.0, image.get_height() / 2.0)
+    canvas.draw_image(image, imageCenter, imageSize, (150, 150), (300, 300))
     
+# draws the back arrow
+def drawBackArrow(canvas):
+    if backArrow.get_width() == 0:
+        return # image is not loaded yet
+    imageSize = (backArrow.get_width(), backArrow.get_height())
+    imageCenter = (backArrow.get_width() / 2.0, backArrow.get_height() / 2.0)
+    canvas.draw_image(backArrow, imageCenter, imageSize, (20, 280), (30, 30))
+
 # Handler to draw menus
 def mainMenu(canvas):
-    canvas.draw_text("Python Tic Tac Toe", [50,50], 26, "White")
-    canvas.draw_text("Play Game", [50,250], 18, "Yellow")
+    drawToEntireScreen(canvas, TicTacToeMainMenu)
+
+def creditsMenu(canvas):
+    drawToEntireScreen(canvas, TicTacToeMainCredits)
+    drawBackArrow(canvas)
+   
+def optionsMenu(canvas):
+    drawToEntireScreen(canvas, background)
+    
+    # highlight player 1 (X) option
+    global player_x
+    if player_x == "bot":
+        drawToEntireScreen(canvas, Player1CPUHighlight)
+    else:
+        drawToEntireScreen(canvas, Player1HumanHighlight)
+    
+    # highlight player 2 (O) option
+    global player_o
+    if player_o == "bot":
+        drawToEntireScreen(canvas, Player2CPUHighlight)
+    else:
+        drawToEntireScreen(canvas, Player2HumanHighlight) 
+        
+    # highlight difficulty option
+    global hardCPUDifficulty
+    if hardCPUDifficulty:
+        drawToEntireScreen(canvas, CPUHardHighlight)
+    else:
+        drawToEntireScreen(canvas, CPUEasyHighlight)    
+    
+    drawToEntireScreen(canvas, TicTacToeOptions)
+    drawBackArrow(canvas)
     
 def boardMenu(canvas):
     global game_state
     global board
-    canvas.draw_text("Board", [118,25], 26, "White")
-    doubleGridSize = gridSize * 2
-    
-    # horizontal lines
-    canvas.draw_line((150 - gridSize - doubleGridSize, 150 - gridSize), (150 + gridSize + doubleGridSize, 150 - gridSize), 3, "Gray")
-    canvas.draw_line((150 - gridSize - doubleGridSize, 150 + gridSize), (150 + gridSize + doubleGridSize, 150 + gridSize), 3, "Gray")
-    
-    # vertical lines
-    canvas.draw_line((150 - gridSize, 150 - gridSize - doubleGridSize), (150 - gridSize, 150 + gridSize + doubleGridSize), 3, "Gray")
-    canvas.draw_line((150 + gridSize, 150 - gridSize - doubleGridSize), (150 + gridSize, 150 + gridSize + doubleGridSize), 3, "Gray")
+    drawToEntireScreen(canvas, background)  
+    drawToEntireScreen(canvas, boardImage)  
     
     # game end state - draw additional text
     if game_state == "end":
         global game_over_message
-        canvas.draw_text(game_over_message, [20,265], 18, "Orange")
-        canvas.draw_text("Click anywhere to restart.", [20,280], 13, "Gray")
+        global endscreenX
+        global endscreenO
+        global endscreenTie
+        if game_over_message == "O":
+            drawToEntireScreen(canvas, endscreenO)
+        elif game_over_message == "X":
+            drawToEntireScreen(canvas, endscreenX)
+        else:
+            drawToEntireScreen(canvas, endscreenTie)
         
         # if there's a winner, draw the line connecting the 3 matching slots
         global winner
@@ -103,6 +222,7 @@ def boardMenu(canvas):
             canvas.draw_line(gameOverStateLine[0], gameOverStateLine[1], 20, "#00bb7890")
     
     # display X and O on the board
+    doubleGridSize = gridSize * 2
     topLeftPosition = (150 - doubleGridSize, 150 - doubleGridSize)
     for row in range(3):
         for column in range(3):
@@ -111,10 +231,12 @@ def boardMenu(canvas):
                 topLeftPosition[0] + (row * doubleGridSize),
                 topLeftPosition[1] + (column * doubleGridSize)
             )
+            iconDimensions = (playerXImg.get_width(), playerXImg.get_height())
+            iconCenter = (playerXImg.get_width() / 2.0, playerXImg.get_height() / 2.0)
             if cellDisplay == "X":
-                canvas.draw_image(playerXImg, (250, 250), (500, 500), cellPosition, (iconSize, iconSize))
+                canvas.draw_image(playerXImg, iconCenter, iconDimensions, cellPosition, (iconSize, iconSize))
             elif cellDisplay == "O":
-                canvas.draw_image(playerOImg, (250, 250), (500, 500), cellPosition, (iconSize, iconSize))
+                canvas.draw_image(playerOImg, iconCenter, iconDimensions, cellPosition, (iconSize, iconSize))
             
     # when a bot is picking a slot (just a delay)
     if game_state == "bot picking":
@@ -125,13 +247,13 @@ def boardMenu(canvas):
             global player
             global bot_x_difficulty
             global bot_o_difficulty
-            if player == "X":
-                botPickSlot(bot_x_difficulty)
-            else:
-                botPickSlot(bot_o_difficulty)
+            botPickSlot()
                 
             # go to next turn, check for winner, etc.
             continueGame()
+            
+    # draw the back button
+    drawBackArrow(canvas)
             
 # Create a frame and assign callbacks to event handlers
 frame = simplegui.create_frame("Python Tic Tac Toe", 300, 300)
@@ -147,8 +269,7 @@ frame.start()
 game_state = 'continue'
 player_x = 'player'
 player_o = 'bot'
-bot_x_difficulty = 1.0
-bot_o_difficulty = 1.0
+hardCPUDifficulty = False
 player = 'X'
 bot_timer = 0
 game_over_message = ''
@@ -196,7 +317,7 @@ def continueGame():
     # check the board for winners
     if checkWinnerForBoard(board):
         winner = True
-        gameOver(player + " wins the game!")
+        gameOver(player)
         return
     
     # switch turns
@@ -208,7 +329,7 @@ def continueGame():
     # check if all slots are filled
     if checkAllSlotsFull(board):
         winner = False
-        gameOver("Tie!")
+        gameOver("Tie")
         return
         
     # if the next player is a bot, let it pick a slot
@@ -303,7 +424,7 @@ def checkWinnerForBoard(board):
 gameOverStateLine = ()
         
 # algorithm for when a bot picks a slot
-def botPickSlot(bot_difficulty):
+def botPickSlot():
     global player
     global board
     global game_state
@@ -352,8 +473,8 @@ def botPickSlot(bot_difficulty):
         randomPick()
                 
     # depending on difficulty, bot will decide to pick the optimal slot or a random slot
-    if random.random() >= bot_difficulty:
-        randomPick()
-    else:
+    if hardCPUDifficulty:
         optimalPick()
+    else:
+        randomPick()
     
