@@ -1,5 +1,6 @@
 # Python-Tic-Tac-Toe
 A simple little tic tae toc game made in python made for a college CSE project.
+main.py contains the source code that runs the entire program - it needs to be run on Codeskulptor. You can play this in Codeskulptor by picking one of the prototypes.
 
 ![Game icon](https://raw.githubusercontent.com/RXCodes/Python-Tic-Tac-Toe/main/images/Icon-v2.jpg)
 
